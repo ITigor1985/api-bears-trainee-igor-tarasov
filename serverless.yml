@@ -1,4 +1,4 @@
-org: xromer
+slsorg: xromer
 app: http-api
 service: http-api
 frameworkVersion: "3"
