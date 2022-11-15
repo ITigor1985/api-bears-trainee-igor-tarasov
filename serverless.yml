@@ -1,19 +1,131 @@
-slsorg: xromer
-app: http-api
-service: http-api
-frameworkVersion: "3"
+service: api
+
+custom:
+  settings:
+    COLUMNS_TABLE: columns
+    CARDS_TABLE: cards
 
 provider:
   name: aws
-  runtime: nodejs14.x
+  runtime: nodejs16.x
+  environment: ${self:custom.settings}
+  region: us-east-1
+  iam:
+    role:
+      statements:
+        - Effect: "Allow"
+          Action:
+            - dynamodb:DescribeTable
+            - dynamodb:Query
+            - dynamodb:Scan
+            - dynamodb:GetItem
+            - dynamodb:PutItem
+            - dynamodb:UpdateItem
+            - dynamodb:DeleteItem
+          Resource:
+            - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:custom.settings.COLUMNS_TABLE}"
+            - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:custom.settings.CARDS_TABLE}"
+
+resources:
+  Resources:
+    CreateTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: "column_id"
+            AttributeType: "S"
+        KeySchema:
+          - AttributeName: "column_id"
+            KeyType: "HASH"
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: ${self:custom.settings.COLUMNS_TABLE}
+    CardsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: "card_id"
+            AttributeType: "S"
+        KeySchema:
+          - AttributeName: "card_id"
+            KeyType: "HASH"
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: ${self:custom.settings.CARDS_TABLE}
 
 functions:
-  hello:
-    handler: handler.hello
+  createColumn:
+    handler: controllers/handlerColumns.createColumn
     events:
-      - httpApi:
-          path: /
-          method: get
+      - http:
+          path: /column
+          method: POST
+
+  getColumns:
+    handler: controllers/handlerColumns.getColumns
+    events:
+      - http:
+          path: /columns
+          method: GET
+
+  getColumn:
+    handler: controllers/handlerColumns.getColumn
+    events:
+      - http:
+          path: /column/{column_id}
+          method: GET
+
+  updateColumn:
+    handler: controllers/handlerColumns.updateColumn
+    events:
+      - http:
+          path: /column/{column_id}
+          method: PUT
+
+  deleteColumn:
+    handler: controllers/handlerColumns.deleteColumn
+    events:
+      - http:
+          path: /column/{column_id}
+          method: DELETE
+
+  #Functions for cards-------------------------------------------------------------------------------
+  createCard:
+    handler: controllers/handlerCards.createCard
+    events:
+      - http:
+          path: /card
+          method: POST
+
+  getCards:
+    handler: controllers/handlerCards.getCards
+    events:
+      - http:
+          path: /cards
+          method: GET
+
+  getCard:
+    handler: controllers/handlerCards.getCard
+    events:
+      - http:
+          path: /card/{card_id}
+          method: GET
+
+  updateCard:
+    handler: controllers/handlerCards.updateCard
+    events:
+      - http:
+          path: /card/{card_id}
+          method: PUT
+
+  deleteCard:
+    handler: controllers/handlerCards.deleteCard
+    events:
+      - http:
+          path: /card/{card_id}
+          method: DELETE
 
 plugins:
   - serverless-offline
