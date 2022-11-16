@@ -39,7 +39,7 @@ module.exports.getColumn = async (event, context, callback) => {
 module.exports.updateColumn = async (event, context, callback) => {
   const { column_id } = event.pathParameters;
   const { title, createdAt, orderId } = JSON.parse(event.body);
-  //console.log(event);
+  console.log("orderId", orderId);
   const paramValue = { title, orderId, createdAt };
   try {
     const column = await columnsServices.updateColumn(column_id, paramValue);
@@ -51,10 +51,10 @@ module.exports.updateColumn = async (event, context, callback) => {
 };
 
 module.exports.deleteColumn = async (event, context, callback) => {
-  const { column_id, orderId } = event.pathParameters;
+  const { column_id } = event.pathParameters;
 
   try {
-    const column = await columnsServices.deleteColumn(column_id, orderId);
+    const column = await columnsServices.deleteColumn(column_id);
     callback(null, response(200, "Column successfully deleted"));
   } catch (err) {
     console.log('This is a "delete column" handler error: ', err);

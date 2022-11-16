@@ -40,16 +40,21 @@ module.exports.getColumn = async (id) => {
   return await dbquery.getItem(params);
 };
 
-module.exports.updateColumn = async (column_id, { title, orderId }) => {
+module.exports.updateColumn = async (
+  column_id,
+  { title, orderId, createdAt }
+) => {
   if (checkString(title)) {
+    //console.log("orderId", orderId);
     const params = {
       Key: { column_id },
       TableName,
       ConditionExpression: "attribute_exists(column_id)",
-      UpdateExpression: `set title = :value, orderId = :o`,
+      UpdateExpression: `set title = :value, orderId = :o, createdAt=:c`,
       ExpressionAttributeValues: {
         ":value": title,
         ":o": orderId,
+        ":c": createdAt,
       },
       ReturnValues: "ALL_NEW",
     };
