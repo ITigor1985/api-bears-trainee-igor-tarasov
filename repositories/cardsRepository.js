@@ -12,7 +12,7 @@ module.exports.createCard = async (title, column_id, orderId) => {
       title,
       column_id,
       orderId,
-      description: "Description body",
+      description: "",
     };
 
     const params = {
