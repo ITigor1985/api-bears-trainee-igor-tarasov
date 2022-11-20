@@ -6,6 +6,7 @@ module.exports.createCard = async (event, context, callback) => {
 
   try {
     const card = await cardsServices.createCard(title, column_id, orderId);
+
     callback(null, response(200, card));
   } catch (err) {
     console.log('This is a "create card" handler error: ', err);
@@ -16,6 +17,7 @@ module.exports.createCard = async (event, context, callback) => {
 module.exports.getCards = async (event, context, callback) => {
   try {
     const cards = await cardsServices.getCards();
+
     callback(null, response(200, cards.Items));
   } catch (err) {
     console.log('This is a "get cards" handler error: ', err);
